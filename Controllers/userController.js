@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
 const User = require("../Models/UserModel");
+const Comment = require("../Models/CommentModel");
 const jWT = require("jsonwebtoken");
 const JWTKEY = "zaidfazilzaibashahinoor";
 const post = require("../Models/Post");
@@ -58,6 +58,14 @@ const signIn = async (req, res) => {
   });
 };
 
+// Getting All USer
+const allUsers = async (req, res) => {
+  User.find({})
+    .select("-password -confirmPassword")
+    .then((data) => res.send({ data }))
+    .catch((err) => console.log(err));
+};
+
 const posts = async (req, res) => {
   const { image, content, postedBy } = req.body;
   if (!content && !image) {
@@ -68,26 +76,15 @@ const posts = async (req, res) => {
       content,
       postedBy,
     });
-    newPosts
-      .save()
-      .then((data) => {
-        res.json({ Message: "Uploaded Successfully", data });
-      })
-      .catch((err) => {
-        console.log(err);
+    newPosts.save().then((data) => {
+      return res.json({
+        success: true,
+        Message: "Uploaded Successfully",
+        data,
       });
+    });
   }
 };
-
-// router.get("/getAllReq", async (req, res) => {
-//   IssueBookModel.find({})
-//     .select("firstName lastName bookName bookLang")
-//     .populate("studentId")
-//     .populate("bookId")
-//     .then((data) => {
-//       res.send(data);
-//     });
-// });
 
 const allPosts = async (req, res) => {
   post
@@ -105,36 +102,161 @@ const myPost = async (req, res) => {
     .catch((err) => console.log(err));
 };
 
+// const likePost =async (req,res) => {
+//   try{
+//    const Posts = await post.findById(req.params.id)
+//    if(!Posts.likes.includes(req.body.userId)){
+//     await Posts.updateOne({$push : {likes:req.body.userId}})
+//     res.status(200).json({message:"Your Posts has been Liked"})
+//    }
+//    else{
+//      await Posts.updateOne({ $pull: { likes: req.body.userId } });
+//    }
+//   }catch(err){
+
+//   }
+// }
+
 const likePost = async (req, res) => {
   post
     .findByIdAndUpdate(
-      req.params.id,
+      req.params.postId,
       {
-        $push: { likes: req.body.id },
+        $push: { likes: req.body.userId },
       },
       {
         new: true,
       }
     )
+    .populate("postedBy")
+    // .populate("likes")
     .exec((err, result) => {
       if (err) {
         console.log(err);
       } else {
-        res.json({ result });
+        res.json({ success: true, result });
+      }
+    });
+};
+const unLikePost = async (req, res) => {
+  post
+    .findByIdAndUpdate(
+      req.params.postId,
+      {
+        $pull: { likes: req.body.userId },
+      },
+      {
+        new: true,
+      }
+    )
+    .populate("postedBy")
+    .exec((err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json({ success: true, result });
       }
     });
 };
 
-const test = async (req, res) => {
-  res.send("hwllo");
-  console.log("hello");
+const commentPost = async (req, res) => {
+  const { comment, userId, postId } = req.body;
+
+  const newComment = new Comment({
+    comment,
+    userId,
+    postId,
+  });
+  newComment.save().then((comment) => {
+    return res.json({
+      Message: "Uploaded Successfully",
+      comment,
+    });
+  });
+};
+
+const getComment = async (req, res) => {
+  Comment.find({ postId: req.params.postId })
+    .populate("postId userId")
+    .then((comment) => res.json({ comment }))
+    .catch((err) => res.send(err));
+};
+
+// Getting USer Profile
+const profile = (req, res) => {
+  console.log(req.params.id);
+  User.findOne({ _id: req.params.id })
+    .then((user) => {
+      res.send({ user });
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+};
+
+const userProfile = async (req, res) => {
+  post
+    .find({ postedBy: req.params.userId })
+    .populate("postedBy", "name username email profile userName")
+    .then((data) => res.json({ data }))
+    .catch((err) => console.log(err));
+};
+
+const updateProfile = async (req, res) => {
+  const { names, userNames, bios, links } = req.body;
+  //  name || userName|| bio|| link ?
+  let user;
+  try {
+    user = await User.findByIdAndUpdate(req.params.id, {
+      name: names,
+      userName: userNames,
+      bio: bios,
+      link: links,
+    });
+  } catch (err) {
+    return console.log(err);
+  }
+  if (!user) {
+    return res.send({ message: "Error" });
+  } else {
+    return res.send({ message: "Updated Successfully", user });
+  }
+};
+
+const SinglePost = async (req, res) => {
+  let posts;
+  try {
+    posts = await post
+      .findById(req.params.postId)
+      .populate("comments.postedBy");
+  } catch (error) {
+    return console.log(error);
+  }
+  if (!posts) {
+    return res.send({ message: "NOt Found" });
+  }
+  return res.send({ posts });
+};
+
+const deletePost = async (req, res) => {
+  post
+    .findByIdAndRemove(req.params.postId)
+    .then((data) => res.send({ message: "Deleted", data }))
+    .catch((err) => res.send(err));
 };
 
 exports.signUp = signUp;
 exports.signIn = signIn;
-exports.test = test;
 exports.posts = posts;
 exports.allPosts = allPosts;
 exports.myPost = myPost;
 exports.likePost = likePost;
-// exports = { getData };
+exports.unLikePost = unLikePost;
+exports.profile = profile;
+exports.userProfile = userProfile;
+exports.allUsers = allUsers;
+exports.commentPost = commentPost;
+exports.updateProfile = updateProfile;
+exports.SinglePost = SinglePost;
+exports.getComment = getComment;
+exports.deletePost = deletePost;

@@ -27,6 +27,12 @@ const userSchema = mongoose.Schema({
     type: String,
     default: "http://www.gravatar.com/avatar/?d=mp",
   },
+  bio: {
+    type: String,
+  },
+  link: {
+    type: String,
+  },
 });
 
 const user = mongoose.model("users", userSchema);

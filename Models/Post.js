@@ -12,13 +12,13 @@ const postSchema = mongoose.Schema({
     },
   ],
 
-  comments: [
-    {
-      type: mongoose.Types.ObjectId,
-      ref: "users",
-      comment: "String",
-    },
-  ],
+  // comments: [
+  //   {
+  //     text: String,
+  //     postedBy: { type: mongoose.Types.ObjectId, ref: "users" },
+  //   },
+  // ],
+
   content: {
     type: String,
   },

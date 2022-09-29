@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 // Getting Routes files
 const userRoute = require("./Routes/userRoute");
@@ -30,7 +31,8 @@ mongoose
 // Getting Models files
 const user = require("./Models/UserModel");
 const post = require("./Models/Post");
+const comments = require("./Models/CommentModel");
 
-app.listen(5000, () => {
+app.listen(5000, "192.168.0.106", () => {
   console.log(`Connected Successfully on port 5000`);
 });
