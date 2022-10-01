@@ -96,7 +96,7 @@ const allPosts = async (req, res) => {
 
 const myPost = async (req, res) => {
   post
-    .find({ postedBy: req.params.id })
+    .find({ postedBy: req.params.Id })
     .populate("postedBy", "name username email profile userName")
     .then((data) => res.json({ data }))
     .catch((err) => console.log(err));
@@ -185,7 +185,7 @@ const getComment = async (req, res) => {
 // Getting USer Profile
 const profile = (req, res) => {
   console.log(req.params.id);
-  User.findOne({ _id: req.params.id })
+  User.findOne({ _id: req.params.Id })
     .then((user) => {
       res.send({ user });
     })
@@ -196,7 +196,7 @@ const profile = (req, res) => {
 
 const userProfile = async (req, res) => {
   post
-    .find({ postedBy: req.params.userId })
+    .find({ postedBy: req.params.Id })
     .populate("postedBy", "name username email profile userName")
     .then((data) => res.json({ data }))
     .catch((err) => console.log(err));
@@ -245,6 +245,30 @@ const deletePost = async (req, res) => {
     .catch((err) => res.send(err));
 };
 
+const followUser = async (req, res) => {
+  if (req.body.userId !== req.params.id) {
+    try {
+      const user = await User.findById(req.params.id);
+      const CurrentUser = await User.findById(req.body.userId);
+      if (!user.followers.includes(req.body.userId)) {
+        await user
+          .updateOne({ $push: { followers: req.body.userId } })
+          .populate("followers");
+        await CurrentUser.updateOne({
+          $push: { followings: req.params.id },
+        }).populate("followings");
+        res.send({ user, CurrentUser });
+      } else {
+        res.send({ message: "You Alreaddy follow this User" });
+      }
+    } catch (err) {
+      res.send(err);
+    }
+  } else {
+    res.send({ message: "You can't follow Yourself" });
+  }
+};
+
 exports.signUp = signUp;
 exports.signIn = signIn;
 exports.posts = posts;
@@ -260,3 +284,4 @@ exports.updateProfile = updateProfile;
 exports.SinglePost = SinglePost;
 exports.getComment = getComment;
 exports.deletePost = deletePost;
+exports.followUser = followUser;

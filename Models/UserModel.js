@@ -27,6 +27,18 @@ const userSchema = mongoose.Schema({
     type: String,
     default: "http://www.gravatar.com/avatar/?d=mp",
   },
+  followers: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "users",
+    },
+  ],
+  followings: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "users",
+    },
+  ],
   bio: {
     type: String,
   },
