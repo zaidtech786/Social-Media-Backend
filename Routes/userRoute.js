@@ -16,6 +16,7 @@ const {
   getComment,
   deletePost,
   followUser,
+  unFollowUser,
 } = require("../Controllers/userController");
 const Router = express.Router();
 const middleware = require("../middleWare/middleware");
@@ -35,6 +36,7 @@ Router.post("/comment", commentPost);
 Router.put("/update/:id", updateProfile);
 Router.get("/singlepost/:postId", SinglePost);
 Router.delete("/deletepost/:postId", deletePost);
-Router.put("/follow/:id", followUser);
+Router.put("/follow/:Id", followUser);
+Router.put("/unfollow/:Id", unFollowUser);
 // Router.get("/userprofile/:userId", userProfile);
 module.exports = Router;

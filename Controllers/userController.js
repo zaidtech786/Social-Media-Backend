@@ -8,7 +8,6 @@ const middleware = require("../middleWare/middleware");
 const signUp = async (req, res) => {
   const { username, name, email, password, confirmPassword, profile } =
     req.body;
-  console.log(username, name, email, password, confirmPassword, profile);
   // let user;
   User.findOne({ email: email, userName: username }, (err, user) => {
     if (user) {
@@ -50,7 +49,7 @@ const signIn = async (req, res) => {
         res.send({ error: "Password Is Incorrect" });
       } else {
         let token = jWT.sign({ _id: user._id }, JWTKEY, { expiresIn: 2 });
-        console.log(token);
+        // console.log(token);
 
         res.send({ Message: "Login Successfully", token, user });
       }
@@ -122,7 +121,7 @@ const likePost = async (req, res) => {
     .findByIdAndUpdate(
       req.params.postId,
       {
-        $push: { likes: req.body.userId },
+        $addToSet: { likes: req.body.userId },
       },
       {
         new: true,
@@ -184,7 +183,7 @@ const getComment = async (req, res) => {
 
 // Getting USer Profile
 const profile = (req, res) => {
-  console.log(req.params.id);
+  // console.log(req.params.id);
   User.findOne({ _id: req.params.Id })
     .then((user) => {
       res.send({ user });
@@ -248,14 +247,37 @@ const deletePost = async (req, res) => {
 const followUser = async (req, res) => {
   if (req.body.userId !== req.params.id) {
     try {
-      const user = await User.findById(req.params.id);
+      const user = await User.findById(req.params.Id);
       const CurrentUser = await User.findById(req.body.userId);
       if (!user.followers.includes(req.body.userId)) {
         await user
           .updateOne({ $push: { followers: req.body.userId } })
           .populate("followers");
         await CurrentUser.updateOne({
-          $push: { followings: req.params.id },
+          $push: { followings: req.params.Id },
+        }).populate("followings");
+        res.send({ user, CurrentUser });
+      } else {
+        res.send({ message: "You Alreaddy follow this User" });
+      }
+    } catch (err) {
+      res.send(err);
+    }
+  } else {
+    res.send({ message: "You can't follow Yourself" });
+  }
+};
+const unFollowUser = async (req, res) => {
+  if (req.body.userId !== req.params.id) {
+    try {
+      const user = await User.findById(req.params.Id);
+      const CurrentUser = await User.findById(req.body.userId);
+      if (user.followers.includes(req.body.userId)) {
+        await user
+          .updateOne({ $pull: { followers: req.body.userId } })
+          .populate("followers");
+        await CurrentUser.updateOne({
+          $pull: { followings: req.params.Id },
         }).populate("followings");
         res.send({ user, CurrentUser });
       } else {
@@ -285,3 +307,4 @@ exports.SinglePost = SinglePost;
 exports.getComment = getComment;
 exports.deletePost = deletePost;
 exports.followUser = followUser;
+exports.unFollowUser = unFollowUser;
