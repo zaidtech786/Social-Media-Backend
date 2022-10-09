@@ -281,7 +281,7 @@ const unFollowUser = async (req, res) => {
         }).populate("followings");
         res.send({ user, CurrentUser });
       } else {
-        res.send({ message: "You Alreaddy follow this User" });
+        res.send({ message: "You Already Unfollow this User" });
       }
     } catch (err) {
       res.send(err);

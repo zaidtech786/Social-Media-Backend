@@ -11,7 +11,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Getting Routes files
 const userRoute = require("./Routes/userRoute");
+const chatRoute = require("./Routes/ChatRoute");
 app.use("/api", userRoute);
+app.use("/chat", chatRoute);
 
 // MongoDb Setup
 let dbUri =
@@ -32,6 +34,8 @@ mongoose
 const user = require("./Models/UserModel");
 const post = require("./Models/Post");
 const comments = require("./Models/CommentModel");
+const ConversationModel = require("./Models/ConversationModel");
+const MessageModel = require("./Models/MessageModel");
 
 app.listen(5000, "192.168.0.106", () => {
   console.log(`Connected Successfully on port 5000`);
