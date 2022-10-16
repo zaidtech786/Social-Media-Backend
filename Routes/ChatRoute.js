@@ -1,3 +1,5 @@
+const Message = require("../Models/MessageModel");
+
 const {
   StartConversation,
   getConversation,
@@ -9,9 +11,9 @@ const express = require("express");
 const Router = express.Router();
 
 Router.post("/postid", StartConversation);
-Router.get("/getdata/:userId", getConversation);
+Router.get("/getconversation/:userId", getConversation);
 Router.post("/postmessage", postMessage);
-Router.get("/getmessage/:conversationid", getMessage);
+Router.get("/getmessage/:conversationId", getMessage);
 Router.get("/getallmessage", getAllMessage);
 
 module.exports = Router;

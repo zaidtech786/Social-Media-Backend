@@ -22,7 +22,7 @@ const getConversation = async (req, res) => {
   try {
     const conversation = await Conversation.find({
       members: { $in: [req.params.userId] },
-    });
+    }).populate("members");
     res.status(200).json(conversation);
   } catch (err) {
     res.status(500).json(err);
@@ -46,7 +46,7 @@ const postMessage = async (req, res) => {
 const getMessage = async (req, res) => {
   try {
     const messages = await Message.find({
-      conversationId: req.params.Id,
+      conversationId: req.params.conversationId,
     });
     res.status(200).json(messages);
   } catch (err) {
