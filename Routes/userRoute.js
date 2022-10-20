@@ -17,6 +17,7 @@ const {
   deletePost,
   followUser,
   unFollowUser,
+  DeleteComment,
 } = require("../Controllers/userController");
 const Router = express.Router();
 const middleware = require("../middleWare/middleware");
@@ -38,5 +39,6 @@ Router.get("/singlepost/:postId", SinglePost);
 Router.delete("/deletepost/:postId", deletePost);
 Router.put("/follow/:Id", followUser);
 Router.put("/unfollow/:Id", unFollowUser);
+Router.delete("deletecomment/:commentId", DeleteComment);
 // Router.get("/userprofile/:userId", userProfile);
 module.exports = Router;

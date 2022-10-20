@@ -101,20 +101,6 @@ const myPost = async (req, res) => {
     .catch((err) => console.log(err));
 };
 
-// const likePost =async (req,res) => {
-//   try{
-//    const Posts = await post.findById(req.params.id)
-//    if(!Posts.likes.includes(req.body.userId)){
-//     await Posts.updateOne({$push : {likes:req.body.userId}})
-//     res.status(200).json({message:"Your Posts has been Liked"})
-//    }
-//    else{
-//      await Posts.updateOne({ $pull: { likes: req.body.userId } });
-//    }
-//   }catch(err){
-
-//   }
-// }
 
 const likePost = async (req, res) => {
   post
@@ -168,7 +154,7 @@ const commentPost = async (req, res) => {
   });
   newComment.save().then((comment) => {
     return res.json({
-      Message: "Uploaded Successfully",
+      Message: "Comment Posted Successfully",
       comment,
     });
   });
@@ -181,6 +167,16 @@ const getComment = async (req, res) => {
     .catch((err) => res.send(err));
 };
 
+const DeleteComment = async (req, res) => {
+  const { commentId } = req.params;
+  let comment;
+  try {
+    comment = await Comment.findByIdAndRemove(commentId);
+    res.send({ mesage: "Comment Deleted", comment });
+  } catch (err) {
+    res.send(err);
+  }
+};
 // Getting USer Profile
 const profile = (req, res) => {
   // console.log(req.params.id);
@@ -308,3 +304,4 @@ exports.getComment = getComment;
 exports.deletePost = deletePost;
 exports.followUser = followUser;
 exports.unFollowUser = unFollowUser;
+exports.DeleteComment = DeleteComment;
