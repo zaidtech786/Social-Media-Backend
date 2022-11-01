@@ -101,7 +101,6 @@ const myPost = async (req, res) => {
     .catch((err) => console.log(err));
 };
 
-
 const likePost = async (req, res) => {
   post
     .findByIdAndUpdate(
@@ -179,8 +178,8 @@ const DeleteComment = async (req, res) => {
 };
 // Getting USer Profile
 const profile = (req, res) => {
-  // console.log(req.params.id);
   User.findOne({ _id: req.params.Id })
+    .populate("followings followers")
     .then((user) => {
       res.send({ user });
     })
@@ -192,7 +191,7 @@ const profile = (req, res) => {
 const userProfile = async (req, res) => {
   post
     .find({ postedBy: req.params.Id })
-    .populate("postedBy", "name username email profile userName")
+    .populate("postedBy", "name username email profile")
     .then((data) => res.json({ data }))
     .catch((err) => console.log(err));
 };
